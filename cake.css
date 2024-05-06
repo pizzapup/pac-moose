@@ -1,0 +1,225 @@
+:root {
+  --almond: #ebd9c8ff;
+  --yellow: #faca48ff;
+  --orange-light: #fabe81ff;
+  --orange: #f6a101ff;
+  --red: #f86049ff;
+  --blue-dark: #9592e0ff;
+  --blue: #58c6eeff;
+  --blue-light: #b7cde9ff;
+  --green: #41c282ff;
+
+  --print-red: #ee0700ff;
+  --print-pink: #f3877bff;
+  --print-tan: #f4dec9ff;
+  --pink: #ff9dc3;
+  --background-color: #f5e1de; /* Light pink */
+  --cake-color: #ffcbab; /* Peach */
+  --icing-color: #ff726d; /* Coral */
+  --cherry-color: #ff4c5c; /* Red */
+  --candle-color: #ffe38e; /* Yellow */
+  --halftone-color: rgba(255, 255, 255, 0.2); /* Halftone color */
+
+  --bg-color: white;
+}
+img {
+  width: 400px;
+  height: auto;
+}
+
+#message-box {
+  position: fixed;
+  display: flex;
+  bottom: 150;
+  background-color: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+#message-box-inner {
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+}
+.msg-details {
+  width: 100px;
+  display: flex;
+  gap: 5px;
+}
+.msg-details div {
+  width: 100px;
+}
+.bday-animation {
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  overflow: hidden;
+  /* position: relative; */
+}
+
+.cake01 {
+  fill: var(--cake-color);
+}
+.cake02 {
+  fill: var(--cake-color);
+}
+.cake03 {
+  fill: var(--cake-color);
+}
+.cake04 {
+  fill: var(--cake-color);
+}
+.cake05 {
+  fill: var(--cake-color);
+}
+
+.icing {
+  fill: #fffff2;
+}
+
+.candle {
+  fill: var(--candle-color);
+}
+.plate {
+  fill: var(--candle-color);
+}
+.cake-bread2 {
+  fill: var(--print-pink);
+}
+.cake-bread2:nth-child(3) {
+  fill: var(--print-tan);
+}
+
+.candles {
+  background: transparent;
+  border-radius: 10px 10px 0 0;
+  position: absolute;
+  top: 85px;
+  /* bottom: 336px; */
+  z-index: 1;
+  width: 5px;
+  height: 35px;
+  transform: translateY(-300px);
+  backface-visibility: hidden;
+  animation: inCandle1 500ms 6s ease-out forwards;
+}
+.candles:after,
+.candles:before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 2.22222222px;
+}
+.candles:after {
+  top: 25%;
+  left: 0;
+}
+.candles:before {
+  top: 45%;
+  left: 0;
+}
+.candle1 {
+  top: 70px;
+  height: 45px;
+  /* background: var(--blue); */
+}
+.candle2 {
+  right: 325px;
+  top: 75px;
+  height: 40px;
+  /* background: var(--red); */
+  animation: inCandle2 600ms 6s ease-out forwards;
+}
+.candle3 {
+  right: 390px;
+  top: 75px;
+  height: 40px;
+  /* background: var(--yellow); */
+  animation: inCandle3 700ms 6s ease-out forwards;
+}
+.candle4 {
+  right: 415px;
+  top: 85px;
+  height: 30px;
+  /* background: var(--green); */
+  animation: inCandle4 900ms 6s ease-out forwards;
+}
+.candle5 {
+  right: 300px;
+  top: 85px;
+  height: 30px;
+  animation: inCandle5 900ms 6s ease-out forwards;
+}
+.fire {
+  border-radius: 100%;
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  margin-left: -2.6px;
+  width: 6.66666667px;
+  height: 18px;
+}
+.fire:nth-child(1) {
+  animation: fire 2s 6.5s infinite;
+}
+.fire:nth-child(2) {
+  animation: fire 1.5s 6.5s infinite;
+}
+.fire:nth-child(3) {
+  animation: fire 1s 6.5s infinite;
+}
+.fire:nth-child(4) {
+  animation: fire 0.5s 6.5s infinite;
+}
+.fire:nth-child(5) {
+  animation: fire 0.2s 6.5s infinite;
+}
+
+@keyframes fire {
+  0%,
+  100% {
+    background: rgba(254, 248, 97, 0.5);
+    box-shadow: 0 0 40px 10px rgba(248, 233, 209, 0.2);
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    background: rgba(255, 50, 0, 0.1);
+    box-shadow: 0 0 40px 20px rgba(248, 233, 209, 0.2);
+    transform: translateY(-20px) scale(0);
+  }
+}
+
+@keyframes inCandle1 {
+  to {
+    transform: translateY(0);
+    background: var(--blue);
+  }
+}
+@keyframes inCandle2 {
+  to {
+    transform: translateY(0);
+    background: var(--red);
+  }
+}
+@keyframes inCandle3 {
+  to {
+    transform: translateY(0);
+    background: var(--yellow);
+  }
+}
+@keyframes inCandle4 {
+  to {
+    transform: translateY(0);
+    background: var(--green);
+  }
+}
+@keyframes inCandle5 {
+  to {
+    transform: translateY(0);
+    background: white;
+  }
+}

@@ -2,24 +2,24 @@ let dogSpriteNormal;
 let dogSpriteChomp;
 let dogSprite;
 let isMoving = false;
-let isEating = false; // Flag to indicate whether the dog is currently eating
+let isEating = false;
 let lives = 3;
 let dogSpeed = 3;
 let score = 0;
 let maze = [
-  [1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1],
+  [1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1],
   [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1],
   [1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1],
   [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-  [1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1],
-  [1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1],
-  [2, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 2],
-  [1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 1],
+  [1, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 1],
+  [2, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 2],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
   [1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1],
   [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1],
-  [1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1],
+  [1, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1],
   [2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 2],
-  [1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1],
+  [1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1],
 ];
 let fries = [];
 
@@ -27,10 +27,11 @@ let baseFrySizeX = 15;
 let baseFrySizeY = 3;
 let fryColor = [255, 255, 0];
 let mazeColor = [50, 50, 200];
+// let mazeColor = [80, 100, 150];
 
 let dogX = 100;
 let dogY = 50;
-let scaleFactor = 1.0; // Adjust this value to scale all elements uniformly
+let scaleFactor = 1.0;
 
 const baseTileSize = 50;
 const baseDogSize = 50;
@@ -44,15 +45,15 @@ const frySizeY = baseFrySizeY * scaleFactor;
 let scoreThreshold = 5;
 let currentImageIndex = 0;
 let images = [];
-// Object to store movement state for each direction
+
 let movement = {
   left: false,
   right: false,
   up: false,
   down: false,
 };
-let ghostSpriteOrange;
-let ghostSpriteBlue;
+let ghostSpriteElla;
+let ghostSpriteSteven;
 let ghosts = [
   {x: 0, y: 0, speedX: 1, speedY: 0},
   {x: 0, y: 0, speedX: 0, speedY: 1},
@@ -61,19 +62,25 @@ let ghosts = [
 function preload() {
   dogSpriteNormal = loadImage("assets/moose-normal.png");
   dogSpriteChomp = loadImage("assets/moose-chomp.png");
-  ghostSpriteOrange = loadImage("assets/ghost/el.png");
-  ghostSpriteBlue = loadImage("assets/ghost/steve.png");
+  ghostSpriteElla = loadImage("assets/ghost/el.png");
+  ghostSpriteSteven = loadImage("assets/ghost/steve.png");
+  ghostSpriteRed = loadImage("assets/ghost/red.png");
+  ghostSpriteBlue = loadImage("assets/ghost/blue.png");
+  ghostSpriteBlue2 = loadImage("assets/ghost/blue2.png");
 
   friesSprite = loadImage("assets/ghost/fries.png");
 
-  ghosts[0].sprite = ghostSpriteOrange;
-  ghosts[1].sprite = ghostSpriteBlue;
+  ghosts[0].sprite = ghostSpriteElla;
+  ghosts[1].sprite = ghostSpriteSteven;
 }
+let steve = ghosts[1];
+let ella = ghosts[0];
 
 function setup() {
-  createCanvas(canvasSize, canvasSize);
-  // Add pellets to the maze
+  let canvas = createCanvas(canvasSize, canvasSize);
+  canvas.parent("canvas-container");
   generateFries();
+  print(canvasSize);
   dogSprite = dogSpriteNormal;
   initializeGhosts();
 }
@@ -86,33 +93,29 @@ function generateFries() {
           j * tileSize + tileSize / 2,
           i * tileSize + tileSize / 2
         );
-        let angle = random(TWO_PI); // Generate a random angle
-        fries.push({position, angle}); // Add pellet position and angle to array
+        let angle = random(TWO_PI);
+        fries.push({position, angle});
       }
     }
   }
 }
 
-// move ghosts
 function moveGhost(ghost) {
-  // Move the ghost
   ghost.x += ghost.speedX;
   ghost.y += ghost.speedY;
   checkGhostCollision();
-  // Draw the ghost
+
   image(ghost.sprite, ghost.x, ghost.y, tileSize, tileSize);
 }
 
 function initializeGhosts() {
   for (let ghost of ghosts) {
-    // Randomly select a position until we find an empty tile
     let x, y;
     do {
       x = Math.floor(Math.random() * maze[0].length);
       y = Math.floor(Math.random() * maze.length);
-    } while (maze[y][x] !== 0); // Repeat until an empty tile is found
+    } while (maze[y][x] !== 0);
 
-    // Set the ghost's position
     ghost.x = x * tileSize;
     ghost.y = y * tileSize;
   }
@@ -125,8 +128,6 @@ function checkGhostCollision() {
     {speedX: -1, speedY: 0},
     {speedX: 0, speedY: -1},
   ];
-  // Check if the ghost collides with a wall or Canvas edge
-  // make sure ghosts move direction instead of wrap around canvas like dog does when it reaches edge
 
   for (let ghost of ghosts) {
     let ghostLeft = ghost.x;
@@ -146,7 +147,6 @@ function checkGhostCollision() {
             ghostBottom > wallTop &&
             ghostTop < wallBottom
           ) {
-            // Collision detected
             if (ghost.speedX > 0) {
               ghost.x = wallLeft - tileSize;
             } else if (ghost.speedX < 0) {
@@ -157,7 +157,6 @@ function checkGhostCollision() {
             } else if (ghost.speedY < 0) {
               ghost.y = wallBottom;
             }
-            // Randomly change the ghost's direction
 
             let direction = random(directions);
             ghost.speedX = direction.speedX;
@@ -168,8 +167,14 @@ function checkGhostCollision() {
     }
   }
 }
+function handleButtonMovement(direction, isPressed) {
+  isMoving = isPressed;
+  for (let direction in movement) {
+    movement[direction] = false;
+  }
+  movement[direction] = isPressed;
+}
 function handleMovement(keyCode, isPressed) {
-  // Map arrow key codes to movement directions
   const directionMap = {
     [RIGHT_ARROW]: "right",
     [LEFT_ARROW]: "left",
@@ -177,7 +182,6 @@ function handleMovement(keyCode, isPressed) {
     [UP_ARROW]: "up",
   };
 
-  // dog can only move in one direction at a time
   if (keyCode in directionMap) {
     isMoving = isPressed;
     for (let direction in movement) {
@@ -189,11 +193,10 @@ function handleMovement(keyCode, isPressed) {
 
 function draw() {
   background(0);
-  // Draw the maze
+
   for (let i = 0; i < maze.length; i++) {
     for (let j = 0; j < maze[i].length; j++) {
       if (maze[i][j] === 1) {
-        // Wall
         fill(mazeColor);
         rect(j * tileSize, i * tileSize, tileSize, tileSize);
       }
@@ -205,7 +208,7 @@ function draw() {
   handleGhostFriesCollision();
   checkFryCollision();
   drawFries();
-  // dog chomp when eating fry but then immediately return to normal
+
   if (isEating) {
     dogSprite = dogSpriteChomp;
     setTimeout(() => {
@@ -229,7 +232,7 @@ function draw() {
   }
   displayScore();
 }
-
+let isBlue = false;
 function handleGhostFriesCollision() {
   for (let ghost of ghosts) {
     let d = dist(
@@ -239,20 +242,57 @@ function handleGhostFriesCollision() {
       ghost.y + tileSize / 2
     );
     if (d < dogSize / 2) {
-      if (ghost.sprite === ghostSpriteOrange) {
+      if (ghost.sprite === ghostSpriteElla) {
         score += 2;
-        // 5 times with 500ms timeout, change the sprite for ghostSpriteOrange to friesSprite and back
+        steve.sprite = ghostSpriteBlue;
+        setTimeout(() => {
+          steve.sprite = ghostSpriteSteven;
+        }, 5000);
         for (let i = 0; i < 5; i++) {
           setTimeout(() => {
-            ghost.sprite = friesSprite;
+            ella.sprite = friesSprite;
           }, i * 300);
           setTimeout(() => {
-            ghost.sprite = ghostSpriteOrange;
+            ella.sprite = ghostSpriteElla;
+          }, i * 500 + 250);
+        }
+        // turn ghostSpriteSteven into ghostSpriteRed for 2seconds
+      }
+      if (ghost.sprite === ghostSpriteSteven) {
+        score -= 1;
+        for (let i = 0; i < 5; i++) {
+          setTimeout(() => {
+            steve.sprite = ghostSpriteRed;
+          }, i * 300);
+          setTimeout(() => {
+            steve.sprite = ghostSpriteSteven;
           }, i * 500 + 250);
         }
       }
       if (ghost.sprite === ghostSpriteBlue) {
-        score -= 1;
+        score += 20;
+        // blink ghostSpriteBlue for 5 seconds
+        for (let i = 0; i < 5; i++) {
+          setTimeout(() => {
+            steve.sprite = ghostSpriteBlue;
+          }, i * 300);
+          setTimeout(() => {
+            steve.sprite = ghostSpriteBlue2;
+          }, i * 500 + 250);
+        }
+
+        ghost.x = -100;
+        ghost.y = -100;
+        setTimeout(() => {
+          let x, y;
+          do {
+            x = Math.floor(Math.random() * maze[0].length);
+            y = Math.floor(Math.random() * maze.length);
+          } while (maze[y][x] !== 0);
+
+          ghost.x = x * tileSize;
+          ghost.y = y * tileSize;
+        }, 5000);
       }
     }
   }
@@ -265,12 +305,12 @@ function setScore() {
 
 function drawFries() {
   setScore();
-  fill(fryColor); // Yellow color
+  fill(fryColor);
   for (let pellet of fries) {
     push();
-    translate(pellet.position.x, pellet.position.y); // Move origin to pellet position
-    rotate(pellet.angle); // Rotate to the specified angle
-    rect(0, 0, 10, 2); // Draw pellet at the rotated position
+    translate(pellet.position.x, pellet.position.y);
+    rotate(pellet.angle);
+    rect(0, 0, 10, 2);
     pop();
   }
 }
@@ -284,13 +324,12 @@ function checkFryCollision() {
       fry.position.y
     );
     if (d < dogSize / 2) {
-      // Dog has collided with a fry
-      fries.splice(i, 1); // Remove fry from array
-      score++; // Increment score
-      isEating = true; // Set the eating flag to true
+      fries.splice(i, 1);
+      score++;
+      isEating = true;
       setTimeout(() => {
         isEating = false;
-      }, 500); // Reset eating flag after 500 milliseconds
+      }, 500);
     }
   }
 }
@@ -308,8 +347,8 @@ function keyReleased() {
 }
 
 function checkCollision() {
-  let overlap = 5; // Amount of overlap to prevent tunneling
-  // if the dog reaches the edge of the canvas, wrap around to the other side
+  let overlap = 5;
+
   if (dogX < 0) {
     dogX = width - dogSize;
   } else if (dogX > width - dogSize) {
@@ -322,7 +361,6 @@ function checkCollision() {
     dogY = 0;
   }
 
-  // Check if the dog collides with a wall
   let dogLeft = dogX;
   let dogRight = dogX + dogSize;
   let dogTop = dogY;
@@ -330,20 +368,17 @@ function checkCollision() {
   for (let i = 0; i < maze.length; i++) {
     for (let j = 0; j < maze[i].length; j++) {
       if (maze[i][j] === 1) {
-        // Calculate the bounds of the wall but allow for some padding
         let wallLeft = j * tileSize + overlap;
         let wallRight = (j + 1) * tileSize - overlap;
         let wallTop = i * tileSize + overlap;
         let wallBottom = (i + 1) * tileSize - overlap;
 
         if (
-          dogRight > wallLeft && // Dog is to the right of the wall's left edge
-          dogLeft < wallRight && // Dog is to the left of the wall's right edge
-          dogBottom > wallTop && // Dog is below the wall's top edge
-          dogTop < wallBottom // Dog is above the wall's bottom edge
+          dogRight > wallLeft &&
+          dogLeft < wallRight &&
+          dogBottom > wallTop &&
+          dogTop < wallBottom
         ) {
-          // Collision detected
-          // Adjust the dog's position to prevent overlap
           if (movement.right) {
             dogX = wallLeft - dogSize;
           } else if (movement.left) {
@@ -363,35 +398,35 @@ function checkCollision() {
 function moveRight() {
   dogX += dogSpeed;
   push();
-  translate(dogX + dogSize / 2, dogY + dogSize / 2); // Translate to the center of the dog
-  scale(-1, 1); // Flip horizontally
-  image(dogSprite, -dogSize / 2, -dogSize / 2, dogSize, dogSize); // Draw dog facing left
+  translate(dogX + dogSize / 2, dogY + dogSize / 2);
+  scale(-1, 1);
+  image(dogSprite, -dogSize / 2, -dogSize / 2, dogSize, dogSize);
   pop();
 }
 
 function moveLeft() {
   dogX -= dogSpeed;
   push();
-  translate(dogX + dogSize / 2, dogY + dogSize / 2); // Translate to the center of the dog
-  image(dogSprite, -dogSize / 2, -dogSize / 2, dogSize, dogSize); // Draw dog facing right
+  translate(dogX + dogSize / 2, dogY + dogSize / 2);
+  image(dogSprite, -dogSize / 2, -dogSize / 2, dogSize, dogSize);
   pop();
 }
 
 function moveDown() {
   dogY += dogSpeed;
   push();
-  translate(dogX + dogSize / 2, dogY + dogSize / 2); // Translate to the center of the dog
-  rotate(HALF_PI); // Rotate 90 degrees clockwise
-  image(dogSprite, -dogSize / 2, -dogSize / 2, dogSize, dogSize); // Draw dog facing up
+  translate(dogX + dogSize / 2, dogY + dogSize / 2);
+  rotate(HALF_PI);
+  image(dogSprite, -dogSize / 2, -dogSize / 2, dogSize, dogSize);
   pop();
 }
 
 function moveUp() {
   dogY -= dogSpeed;
   push();
-  translate(dogX + dogSize / 2, dogY + dogSize / 2); // Translate to the center of the dog
-  scale(-1, 1); // Flip horizontally
-  rotate(HALF_PI); // Rotate 90 degrees clockwise
-  image(dogSprite, -dogSize / 2, -dogSize / 2, dogSize, dogSize); // Draw dog facing down
+  translate(dogX + dogSize / 2, dogY + dogSize / 2);
+  scale(-1, 1);
+  rotate(HALF_PI);
+  image(dogSprite, -dogSize / 2, -dogSize / 2, dogSize, dogSize);
   pop();
 }
