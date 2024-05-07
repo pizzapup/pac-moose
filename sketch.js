@@ -6,45 +6,51 @@ let isEating = false;
 let lives = 3;
 let dogSpeed = 3;
 let score = 0;
+let red = [255, 0, 0];
+let yellow = [255, 255, 0];
+let green = [0, 255, 0];
+let pink = [255, 0, 255];
+
 let maze = [
-  [1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1],
-  [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1],
-  [1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1],
-  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-  [1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 1],
-  [1, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 1],
-  [2, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 2],
-  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-  [1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1],
-  [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1],
-  [1, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1],
-  [2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 2],
-  [1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1],
+  [1, 2, 1, 1, 1, 1, 1, 1, 1, 2, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
+  [1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1],
+  [1, 0, 0, 3, 1, 0, 0, 0, 0, 0, 1],
+  [1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1],
+  [2, 0, 1, 0, 0, 0, 0, 0, 1, 0, 2],
+  [1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1],
+  [1, 0, 0, 0, 1, 0, 1, 3, 0, 0, 1],
+  [1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 2, 1, 1, 1, 1, 1, 1, 1, 2, 1],
+];
+// Index of "4"s in the maze array: [1, 9], [5, 1], [5, 2], [5, 3], [5, 4], [5, 5], [5, 6], [5, 7], [5, 8], [5, 9], [5, 10], [7, 7]
+let powerPellets = [
+  [1, 7],
+  [1, 6],
+  [1, 9],
+  [3, 3],
+  [5, 3],
+  [5, 4],
+  [5, 5],
+  [5, 6],
+  [5, 7],
+  [7, 7],
+  [9, 1],
 ];
 let fries = [];
-
-let baseFrySizeX = 15;
-let baseFrySizeY = 3;
-let fryColor = [255, 255, 0];
 let mazeColor = [50, 50, 200];
-// let mazeColor = [80, 100, 150];
+let fryColor = [255, 255, 0];
+
+const canvasSize = 496;
 
 let dogX = 100;
 let dogY = 50;
-let scaleFactor = 1.0;
+const dogSize = 37.5;
 
-const baseTileSize = 50;
-const baseDogSize = 50;
-const baseCanvasSize = 650;
-
-const tileSize = baseTileSize * scaleFactor;
-const dogSize = baseDogSize * scaleFactor;
-const canvasSize = baseCanvasSize * scaleFactor;
-const frySizeX = baseFrySizeX * scaleFactor;
-const frySizeY = baseFrySizeY * scaleFactor;
-let scoreThreshold = 5;
-let currentImageIndex = 0;
-let images = [];
+const tileSize = 45;
+const frySizeX = 15;
+const frySizeY = 7.5;
 
 let movement = {
   left: false,
@@ -79,12 +85,54 @@ let ella = ghosts[0];
 function setup() {
   let canvas = createCanvas(canvasSize, canvasSize);
   canvas.parent("canvas-container");
+  // addButtons();
   generateFries();
   print(canvasSize);
   dogSprite = dogSpriteNormal;
   initializeGhosts();
 }
+function addButtons() {
+  let buttonSize = 50;
+  let buttonPadding = 10;
 
+  let buttonRight = createButton("Right");
+  buttonRight.position(
+    canvasSize - buttonSize - buttonPadding,
+    canvasSize - buttonSize - buttonPadding
+  );
+  buttonRight.size(buttonSize, buttonSize);
+  buttonRight.mousePressed(() => handleButtonMovement("right", true));
+  buttonRight.mouseReleased(() => handleButtonMovement("right", false));
+
+  let buttonLeft = createButton("Left");
+  buttonLeft.position(
+    canvasSize - buttonSize * 2 - buttonPadding * 2,
+    canvasSize - buttonSize - buttonPadding
+  );
+  buttonLeft.size(buttonSize, buttonSize);
+  buttonLeft.mousePressed(() => handleButtonMovement("left", true));
+  buttonLeft.mouseReleased(() => handleButtonMovement("left", false));
+
+  let buttonUp = createButton("Up");
+  buttonUp.position(
+    canvasSize - buttonSize - buttonPadding,
+    canvasSize - buttonSize * 2 - buttonPadding * 2
+  );
+
+  buttonUp.size(buttonSize, buttonSize);
+  buttonUp.mousePressed(() => handleButtonMovement("up", true));
+  buttonUp.mouseReleased(() => handleButtonMovement("up", false));
+
+  let buttonDown = createButton("Down");
+  buttonDown.position(
+    canvasSize - buttonSize - buttonPadding,
+    canvasSize - buttonSize * 3 - buttonPadding * 3
+  );
+
+  buttonDown.size(buttonSize, buttonSize);
+  buttonDown.mousePressed(() => handleButtonMovement("down", true));
+  buttonDown.mouseReleased(() => handleButtonMovement("down", false));
+}
 function generateFries() {
   for (let i = 0; i < maze.length; i++) {
     for (let j = 0; j < maze[i].length; j++) {
@@ -190,14 +238,66 @@ function handleMovement(keyCode, isPressed) {
     movement[directionMap[keyCode]] = isPressed;
   }
 }
+function drawPowerPellets() {
+  for (let pellet of powerPellets) {
+    // display fries instead of power pellets
+    image(
+      friesSprite,
+      pellet[1] * tileSize,
+      pellet[0] * tileSize,
+      tileSize,
+      tileSize
+    );
+  }
+}
+let isPowerUp = false;
+function powerPelletCollision() {
+  for (let pellet of powerPellets) {
+    let d = dist(
+      // distance between dog and pellet
+      dogX + dogSize / 2, // x position of dog
+      dogY + dogSize / 2, // y position of dog
+      pellet[1] * tileSize + tileSize / 2, // x position of pellet
+      pellet[0] * tileSize + tileSize / 2 // y position of pellet
+    );
+    if (d < dogSize / 2) {
+      // if dog is touching pellet (distance is less than dog size)
+      score += 5;
+      powerPellets.splice(powerPellets.indexOf(pellet), 1);
+    }
+    // redraw power pellets
+    drawPowerPellets();
+    isPowerUp = true;
+    setTimeout(() => {
+      isPowerUp = false;
+    }, 5000);
+  }
+}
 
 function draw() {
   background(0);
 
   for (let i = 0; i < maze.length; i++) {
     for (let j = 0; j < maze[i].length; j++) {
+      fill(0);
+      stroke(0);
       if (maze[i][j] === 1) {
         fill(mazeColor);
+        stroke("#fff");
+        stroke(1);
+        rect(j * tileSize, i * tileSize, tileSize, tileSize);
+      } else if (maze[i][j] === 2) {
+        fill(red);
+        rect(j * tileSize, i * tileSize, tileSize, tileSize);
+      } else if (maze[i][j] === 4) {
+        fill(yellow);
+        rect(j * tileSize, i * tileSize, tileSize, tileSize);
+      } else if (maze[i][j] === 0) {
+        fill(0);
+        stroke(green);
+        rect(j * tileSize, i * tileSize, tileSize, tileSize);
+      } else if (maze[i][j] === 3) {
+        fill(pink);
         rect(j * tileSize, i * tileSize, tileSize, tileSize);
       }
     }
@@ -207,7 +307,9 @@ function draw() {
   }
   handleGhostFriesCollision();
   checkFryCollision();
+  powerPelletCollision();
   drawFries();
+  drawPowerPellets();
 
   if (isEating) {
     dogSprite = dogSpriteChomp;
@@ -347,7 +449,7 @@ function keyReleased() {
 }
 
 function checkCollision() {
-  let overlap = 5;
+  let overlap = 0;
 
   if (dogX < 0) {
     dogX = width - dogSize;
@@ -430,3 +532,5 @@ function moveUp() {
   image(dogSprite, -dogSize / 2, -dogSize / 2, dogSize, dogSize);
   pop();
 }
+
+// REWRITE CODE USING BEST CODING PRACTICES, NEWEST TECHNIQUES, DRY PRINCIPLES, THE MOST CONCISE AND SHORT CODE POSSIBLE (UTILIZE ES6+ FEATURES, SYNTAX, AND THINGS LIKE ARRAY METHODS, OBJECT DESTRUCTURING, CLASSES, ETC. - KEEP THINGS CLEAN AND ORGANIZED - keep related things together, separate concerns, etc.)

@@ -17,7 +17,7 @@
   position: absolute;
   top: -30px;
 }
-#buttons button {
+#buttons .button {
   width: var(--button-width);
   height: var(--button-height);
   display: flex;
@@ -46,10 +46,10 @@
   background: url("assets/imgs/down.png") no-repeat center;
   background-size: 95%;
 }
-#buttons button:hover {
+#buttons .button:hover {
   filter: hue-rotate(100deg) brightness(1.5) saturate(1.5) contrast(1.5);
 }
-#buttons button:active {
+#buttons .button:active {
   content: "";
   border-radius: 50%;
   filter: hue-rotate(200deg) brightness(1.5) saturate(1.5) contrast(1.5)
