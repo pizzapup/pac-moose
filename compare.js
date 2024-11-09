@@ -132,19 +132,6 @@ function checkGhostCollision() {
   }
 }
 
-// Code that is more concise, uses ES6+ features, and is more organized and clean:
-// - identify repeated code and create a function to handle it
-// - use array methods to loop through arrays
-// - use object destructuring to access object properties
-// - use classes to create objects
-// - separate concerns and keep related things together
-// - use the most concise and short code possible
-
-// Collision Detection
-// collision detection is used multiple times to check if the dog, fries, power pellets, or ghosts collide with each other or with walls in the maze. because this logic is repeated, we can create a function to handle it and make the code more organized and concise. the function will be able to be used for all types of collisions by passing in the necessary parameters. this will help to keep the code clean and avoid repetition.
-
-// COLLISION DETECTION
-// check if two objects collide
 function checkCollision(obj1, obj2) {
   let overlap = 0; // overlap value to prevent objects from getting stuck in walls
 
