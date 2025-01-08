@@ -11,3 +11,5 @@ Pac-Moose is a simple, Pac-Man-inspired game I created to accompany invitations 
 
 #### Play the game:
 Play Pac-Moose here: [Pac-Moose](https://pizzapup.github.io/pac-moose/)
+
+<img width="496" alt="Pac Moose" src="https://github.com/user-attachments/assets/91cde2f0-32ff-4683-b24f-c4cf45a438ca" />
